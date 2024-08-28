@@ -1,7 +1,9 @@
 const mongoose = require('mongoose');
 const  {ObjectId} = mongoose.Schema.Types ;
 const commentSchema = new mongoose.Schema({
-
+     useremail : {
+          type : String
+     },
      userId : {
           type : ObjectId,
           ref : "User",
@@ -20,6 +22,8 @@ const commentSchema = new mongoose.Schema({
         }
      
 
+},{
+     timestamps : true
 });
 
 const Comment = mongoose.model('comment', commentSchema);

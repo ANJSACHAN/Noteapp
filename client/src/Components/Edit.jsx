@@ -11,7 +11,7 @@ function Edit() {
 
      const initial = {
           title :item.title,
-          desc : item.desc,
+          desc : item.desc,                                                  
           category :item.category,
           note : item.note,
           author:item.author,

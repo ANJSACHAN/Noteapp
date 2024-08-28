@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Comment from './Comment';
-
+import nature from '../assets/nature.jpg'
 
 function Show() {
 
@@ -61,54 +61,81 @@ function Show() {
          console.log('error in uploading', err);
        }
      }
+console.log(email);
+console.log(item.creator)
 
-
-     const [partion, setPartition] = useState(false)
+     const [partition, setPartition] = useState(false)
  
   return (
-    <div className="flex">
-    <div className="w-1/2 pr-4">
-      <div className="max-w-xl mx-auto mt-8 p-8 bg-white rounded shadow-md">
-    <h2 className="text-2xl font-bold mb-4">{item.title}</h2>
-    <div className="mb-4">
-      <img src={item.image} alt={item.title} className="rounded-lg w-full" />
+    <div
+      className="flex justify-center items-center min-h-screen bg-cover bg-center relative"
+      style={{
+        backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(${nature})`,
+        backgroundSize: 'cover',
+      }}
+    >
+      <div
+        className={`transition-transform duration-500 ease-in-out ${
+          partition ? 'translate-x-[-10px]' : 'translate-x-0'
+        } bg-white rounded-lg shadow-lg p-6 max-w-md  relative w-3/5`}
+      
+        style={{
+          backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), url(${nature})`,
+          backgroundSize: "cover",
+        }}
+      >
+        <h2 className="text-2xl text-white font-bold text-center">{item.title}</h2>
+        <div className="w-full flex justify-center items-center p-2">
+            <img
+              src={item.image}
+              className="max-h-full max-w-full object-contain "
+              alt={item.title}
+            />
+          </div>
+        <div className="overflow-y-auto  mb-4">
+          <p className="text-gray-300"><span className="font-bold text-white">Description:</span> {item.desc}</p>
+        </div>
+        <p className="text-gray-300 mb-4"><span className="font-bold text-white">Note:</span> {item.note}</p>
+        <p className="text-gray-300 mb-4"><span className="font-bold text-white">Author:</span> {item.author}</p>
+
+        <div className="flex justify-between items-center mt-4">
+  {item.category === "Public" && (
+    <>
+      <button
+        onClick={() => { onClickSave(item); }}
+        className="bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold px-4 py-2 m-3 rounded-lg shadow-md hover:shadow-lg transition-all"
+      >
+        {showNote ? "Unsave" : "Save"}
+      </button>
+      <button
+        onClick={() => setPartition(!partition)}
+        className="bg-gradient-to-r from-gray-900 to-black text-white text-white font-semibold px-4 py-2 rounded-lg shadow-md hover:shadow-lg transition-all"
+      >
+        {partition ? "Close" : "Comments"}
+      </button>
+    </>
+  )}
+  {email === item.creator && (
+    <div className="flex space-x-3">
+      <button
+        onClick={() => { editNote(item._id); }}
+        className="bg-gradient-to-r from-gray-900 to-black text-white text-white font-semibold px-4 py-2 rounded-lg shadow-md hover:shadow-lg transition-all"
+      >
+        <Link to="/edit" state={{ item }}>Edit</Link>
+      </button>
+      <button
+        onClick={() => { removeNotes(item); }}
+        className="bg-gradient-to-r from-red-500 to-red-600 text-white font-semibold px-4 py-2 rounded-lg shadow-md hover:shadow-lg transition-all"
+      >
+        Remove
+      </button>
     </div>
-    <p className="text-gray-700 mb-4"><span className="font-bold">Description:</span> {item.desc}</p>
-    <p className="text-gray-700 mb-4"><span className="font-bold">Note:</span> {item.note}</p>
-    <p className="text-gray-700 mb-4"><span className="font-bold">Author:</span> {item.author}</p>
-
-    <div>
-    <div>
-      <button onClick={() => { onClickSave(item) }} className="bg-green-500 text-white px-3 py-1 m-3 rounded hover:bg-green-600 focus:outline-none focus:bg-green-600">{
-        showNote ? "Unsave" : "Save"
-      }</button>
-
-      {
-        partion ? (
-          <>
-          <button  onClick={() =>{setPartition(false)}} className="bg-blue-500 text-white px-3 py-1 m-3 rounded hover:bg-blue-600 focus:outline-none focus:bg-blue-600">Close </button>
-          </>
-        ):(
-          <>
-          <button  onClick={() =>{setPartition(true)}} className="bg-blue-500 text-white px-3 py-1 m-3 rounded hover:bg-blue-600 focus:outline-none focus:bg-blue-600">Comment </button>
-          </>
-        )
-      }
+  )}
 </div>
 
-      {(email === item.creator) && (
-        <div>
-          <button onClick={() => { editNote(item._id) }} className="bg-blue-500 text-white px-3 py-1 m-3 rounded hover:bg-blue-600 focus:outline-none focus:bg-blue-600"><Link to={"/edit"} state={{ item: item }}>Edit</Link> </button>
-          <button onClick={() => { removeNotes(item) }} className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 focus:outline-none focus:bg-blue-600">Remove</button>
-        </div>
-      )}
-    </div>
+      </div>
 
-   
-  </div>
-  </div>
-
-  {partion && (
+  {partition && (
     <div className="w-1/2 pl-4">
       <div>
         <Comment  id = {item._id} />
@@ -120,3 +147,10 @@ function Show() {
 }
 
 export default Show
+
+// {(email === item.creator) && (
+//   <div>
+//     <button onClick={() => { editNote(item._id) }} className="bg-blue-500 text-white px-3 py-1 m-3 rounded hover:bg-blue-600 focus:outline-none focus:bg-blue-600"><Link to={"/edit"} state={{ item: item }}>Edit</Link> </button>
+//     <button onClick={() => { removeNotes(item) }} className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 focus:outline-none focus:bg-blue-600">Remove</button>
+//   </div>
+// )}

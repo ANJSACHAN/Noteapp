@@ -8,31 +8,41 @@ const Notes = require('../models/notes');
 const multer = require("multer");
 const path = require('path');
 const Comment = require('../models/comment');
+const { log } = require('console');
 
 env.config(); // Load environment variables
 
 const port = 8080;
 router.post('/signup', async (req, res) => {
-    const { name, email, password } = req.body;
+    const { name,username, email, password } = req.body;
 
     try {
+        console.log('Received request:', req.body);
+        
         const existingUser = await User.findOne({ email });
         if (existingUser) {
-            console.log("exist")
-            return res.json({
+            console.log("User already exists");
+            return res.status(400).json({
                 msg: "User already exists",
             });
         }
 
+        console.log("Creating new user");
         const hashedPassword = await bcrypt.hash(password, 10);
+        console.log('Hashed password:', hashedPassword);
+
         const newUser = await User.create({
             name,
+            username,
             email,
             password: hashedPassword,
         });
-        res.json(newUser);
+        console.log('New user created:', newUser);
+
+        res.status(201).json(newUser);
     } catch (e) {
-        res.status(500).json({ error: "Error creating user: " + e });
+        console.error("Error creating user:", e);
+        res.status(500).json({ error: "Error creating user: " + e.message });
     }
 });
 
@@ -68,25 +78,33 @@ router.post('/login', async (req, res) => {
     }
 });
 
+function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
 
-router.post('/addnotes', async(req,res)=>{
+router.post('/addnotes', async (req, res) => {
+    const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
+
     const product = new Notes({
-        title :req.body.title,
-        desc : req.body.desc,
-        category :req.body.category,
-        note : req.body.note,
-        author:req.body.author,
-        creator : req.body.creator,
-        image : req.body.image,
-         
-        
-    })
-    await product.save();
-    res.json({
-         success:true,
-         name : req.body.name,
-         })
-})
+        title: capitalize(req.body.title),
+        desc: capitalize(req.body.desc),
+        category: capitalize(req.body.category),
+        note: capitalize(req.body.note),
+        author: capitalize(req.body.author),
+        creator: (req.body.creator),
+        image: req.body.image,
+    });
+
+    try {
+        await product.save();
+        res.json({
+            success: true,
+            name: req.body.name,
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, error: 'Failed to save the note.' });
+    }
+});
 
 router.get('/allpublic' , async(req,res)=>{
 
@@ -300,6 +318,7 @@ router.put('/like/:id', async (req, res) => {
 
 router.post('/comment', async (req, res) => {
     const comment = new Comment({
+        useremail : req.body.useremail,
         userId: req.body.userId,
         comment: req.body.comment,
         likeUser: [], 
@@ -321,16 +340,18 @@ router.post('/comment', async (req, res) => {
     }
 });
 
-router.post('/allcomments', async (req, res) => {
+router.get('/allcomments/:id', async (req, res) => {
     try {
-      const note = await Notes.findById(req.body.id);
+      
+      const note = await Notes.findById(req.params.id);
+
       if (!note) {
         return res.status(404).json({ message: "Note not found" });
       }
-
-      console.log(note.comment)
+  
       const comments = await Comment.find({ _id: { $in: note.comment } });
   
+     console.log(comments)
       res.status(200).json(comments);
     } catch (error) {
       console.error(error);
@@ -339,7 +360,21 @@ router.post('/allcomments', async (req, res) => {
   });
   
 
-
+  router.get('/user/:id', async (req, res) => {
+    try {
+      const user = await User.findById(req.params.id);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+  
+      // Return only the user's name (or other relevant details)
+      res.status(200).json({ name: user.name });
+    } catch (error) {
+      console.error('Error fetching user:', error);
+      res.status(500).json({ message: "Server error" });
+    }
+  });
 
 
 

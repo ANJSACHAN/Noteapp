@@ -12,38 +12,39 @@ import Errorpage from './Components/Errorpage';
 import Edit from './Components/Edit';
 import Saved from './Components/Saved';
 import Context from './Components/Context';
+import Registration from './Components/Registration';
 
 
 
 function App() {
-  const {login} = useContext(Context);
+  const { login } = useContext(Context);
 
   return (
     <div>
-    <Navbar/>
-     <Routes>
-          <Route path="/" element={<Home/>} />
-          <Route path="/login" element={<Login/>}/>
-          <Route path="/signup" element={<Signup/>}/>
+      <Navbar />
+       {/* Add padding to top */}
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/regis" element={<Registration />} />
 
           {login ? (
-          <>
-          <Route path="/add" element={<Add/>}/>
-          <Route path="/personal" element={<Personal/>}/>
-          <Route path="/show" element={<Show/>}/>
-          <Route path ="/saved" element ={<Saved/>}/>
-          <Route path="/edit" element={<Edit/>}/>
-          </> 
-          ):(
-          <>
-          <Route path="*" element={<Errorpage/>}/>
-          </>
-          )
-          }
-    </Routes>
-  <ToastContainer/> 
+            <>
+              <Route path="/add" element={<Add />} />
+              <Route path="/personal" element={<Personal />} />
+              <Route path="/show" element={<Show />} />
+              <Route path="/saved" element={<Saved />} />
+              <Route path="/edit" element={<Edit />} />
+            </>
+          ) : (
+            <Route path="*" element={<Errorpage />} />
+          )}
+        </Routes>
+     
+      <ToastContainer />
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
